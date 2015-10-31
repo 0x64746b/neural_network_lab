@@ -12,7 +12,7 @@ import numpy as np
 from scipy.special import expit
 
 
-DIMENSION_HID = 2
+NUM_HIDDEN_NODES = 3
 # make small, so not easily met accidentally
 ACCEPTED_ERROR = 1e-10
 LEARNING_RATE = 0.1
@@ -43,26 +43,26 @@ class Layer(object):
 
 if __name__ == '__main__':
     # inputs (XOR) and expected outputs
-    data_in = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    data_out = np.array([[0], [1], [1], [0]])
+    input_data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    expected_outputs = np.array([[0], [1], [1], [0]])
 
-    hidden = Layer(DIMENSION_HID, data_in.shape[1], expit)
-    output = Layer(data_out.shape[1], DIMENSION_HID, lambda x: x)
+    hidden = Layer(NUM_HIDDEN_NODES, input_data.shape[1], expit)
+    output = Layer(expected_outputs.shape[1], NUM_HIDDEN_NODES, lambda x: x)
 
     while abs(output.errors) > ACCEPTED_ERROR:
-        random_index = np.random.randint(0, data_in.shape[0])
+        random_index = np.random.randint(0, input_data.shape[0])
 
         # process inputs
-        outputs = output.process(hidden.process(data_in[random_index]))
+        outputs = output.process(hidden.process(input_data[random_index]))
 
         # calculate errors
-        output.errors = data_out[random_index] - outputs
+        output.errors = expected_outputs[random_index] - outputs
         hidden.errors = expit_prime(hidden.h) * np.dot(output.errors, output.weights)
 
         # update weights and biases
         output.backpropagate()
         hidden.backpropagate()
 
-        print('error:', output.errors)
+        print('Error:', output.errors)
 
     print('Weights:\n', hidden.weights, output.weights)
