@@ -33,6 +33,7 @@ class Layer(object):
 
     def process(self, input_vector):
         self.input_vector = input_vector
+        # FIXME: Limited to transfer functions that work on the weighted sum of the inputs
         self.h = np.dot(self.weights, input_vector) + self.biases
         return self._transfer_func(self.h)
 
