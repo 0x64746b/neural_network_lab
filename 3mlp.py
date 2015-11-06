@@ -37,7 +37,7 @@ class Layer(object):
         self.h = np.dot(self.weights, input_vector) + self.biases
         return self._transfer_func(self.h)
 
-    def backpropagate(self):
+    def update(self):
         self.weights += LEARNING_RATE * np.outer(self.errors, self.input_vector)
         self.biases += LEARNING_RATE * self.errors
 
@@ -61,8 +61,8 @@ if __name__ == '__main__':
         hidden.errors = expit_prime(hidden.h) * np.dot(output.errors, output.weights)
 
         # update weights and biases
-        output.backpropagate()
-        hidden.backpropagate()
+        output.update()
+        hidden.update()
 
         print('Error:', output.errors)
 
