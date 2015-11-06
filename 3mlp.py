@@ -13,12 +13,17 @@ from scipy.special import expit
 
 
 NUM_HIDDEN_NODES = 3
-# make small, so not easily met accidentally
 ACCEPTED_ERROR = 1e-10
+ERROR_RATE = 0.05
 LEARNING_RATE = 0.1
 
 
 expit_prime = lambda h: expit(h) * (1 - expit(h))
+
+
+def update_ema(current, average):
+    """Update the exponential moving average."""
+    return ERROR_RATE * abs(current) + (1 - ERROR_RATE) * average
 
 
 class Layer(object):
@@ -50,7 +55,8 @@ if __name__ == '__main__':
     hidden = Layer(NUM_HIDDEN_NODES, input_data.shape[1], expit)
     output = Layer(expected_outputs.shape[1], NUM_HIDDEN_NODES, lambda x: x)
 
-    while abs(output.errors) > ACCEPTED_ERROR:
+    average_error = 1
+    while average_error > ACCEPTED_ERROR:
         random_index = np.random.randint(0, input_data.shape[0])
 
         # process inputs
@@ -64,6 +70,7 @@ if __name__ == '__main__':
         output.update()
         hidden.update()
 
-        print('Error:', output.errors)
+        average_error = update_ema(output.errors, average_error)
+        print('Error:', output.errors, average_error)
 
     print('Weights:\n', hidden.weights, output.weights)
