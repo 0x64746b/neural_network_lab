@@ -9,6 +9,7 @@ from __future__ import (
 )
 
 import numpy as np
+from pandas import ewma
 from scipy.special import expit
 
 
@@ -19,11 +20,6 @@ LEARNING_RATE = 0.1
 
 
 expit_prime = lambda h: expit(h) * (1 - expit(h))
-
-
-def update_ema(current, average):
-    """Update the exponential moving average."""
-    return ERROR_RATE * abs(current) + (1 - ERROR_RATE) * average
 
 
 class Layer(object):
@@ -71,7 +67,11 @@ if __name__ == '__main__':
         output.update()
         hidden.update()
 
-        average_error = update_ema(output.errors, average_error)
-        print('Error:', output.errors, average_error)
+        average_error = ewma(
+            np.array([average_error, abs(output.errors)]),
+            com=(1 / ERROR_RATE - 1),
+            adjust=False
+        )[-1]
+        print('Error:', output.errors, 'Avg:', average_error)
 
     print('Weights:\n', hidden.weights, output.weights)
