@@ -22,6 +22,28 @@ LEARNING_RATE = 0.1
 expit_prime = lambda h: expit(h) * (1 - expit(h))
 
 
+class AverageError(object):
+
+    def __init__(self, target, smoothing_factor):
+        self._target = target
+        self._center_of_mass = 1 / smoothing_factor - 1
+        self._value = 1.0
+
+    def update(self, error):
+        self._value = ewma(
+            np.array([self._value, abs(error)]),
+            com=self._center_of_mass,
+            adjust=False
+        )[-1]
+
+    @property
+    def too_large(self):
+        return bool(self._value > self._target)
+
+    def __str__(self):
+        return str(self._value)
+
+
 class Layer(object):
 
     """Encapsulate the state of a layer."""
@@ -52,8 +74,8 @@ if __name__ == '__main__':
     hidden = Layer(NUM_HIDDEN_NODES, input_data.shape[1], expit)
     output = Layer(expected_outputs.shape[1], NUM_HIDDEN_NODES, lambda x: x)
 
-    average_error = 1
-    while average_error > ACCEPTED_ERROR:
+    average_error = AverageError(ACCEPTED_ERROR, ERROR_RATE)
+    while average_error.too_large:
         random_index = np.random.randint(0, input_data.shape[0])
 
         # process inputs
@@ -67,11 +89,7 @@ if __name__ == '__main__':
         output.update()
         hidden.update()
 
-        average_error = ewma(
-            np.array([average_error, abs(output.errors)]),
-            com=(1 / ERROR_RATE - 1),
-            adjust=False
-        )[-1]
+        average_error.update(output.errors)
         print('Error:', output.errors, 'Avg:', average_error)
 
     print('Weights:\n', hidden.weights, output.weights)
