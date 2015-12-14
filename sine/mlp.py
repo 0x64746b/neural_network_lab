@@ -119,8 +119,8 @@ if __name__ == '__main__':
             print('expected output:', input_data[next_index])
             print('actual output:', outputs)
             print('output error:', output.errors[0])
-            last_training_run[current_index] = outputs
-            last_training_errors[current_index] = output.errors
+            last_training_run[next_index] = outputs
+            last_training_errors[next_index] = output.errors
 
     # plot results
     plt.plot(sampling_points, input_data, 'b', label='input')
