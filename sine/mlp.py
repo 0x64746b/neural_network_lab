@@ -12,6 +12,7 @@ from __future__ import (
 from collections import deque
 import math
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import expit
 
@@ -89,6 +90,7 @@ class RecurrentLayer(Layer):
 if __name__ == '__main__':
     sampling_points = np.linspace(0, 2*math.pi, num=NUM_SAMPLES, endpoint=False)
     input_data = np.array([math.sin(x) for x in sampling_points]).reshape((NUM_SAMPLES, 1))
+    last_training_run = np.zeros(NUM_SAMPLES)
 
     hidden = RecurrentLayer(NUM_HIDDEN_NODES, input_data.shape[1], expit, HISTORY_LENGTH)
     output = Layer(input_data.shape[1], NUM_HIDDEN_NODES, lambda x: x)
@@ -116,3 +118,16 @@ if __name__ == '__main__':
             print('expected output:', input_data[next_index])
             print('actual output:', outputs)
             print('output error:', output.errors[0])
+            last_training_run[current_index] = outputs
+
+    # plot results
+    input_line, last_training_line = plt.plot(
+        sampling_points, input_data, 'b',
+        sampling_points, last_training_run, 'r'
+    )
+
+    input_line.set_label('input')
+    last_training_line.set_label('last training run')
+
+    plt.legend()
+    plt.show()
