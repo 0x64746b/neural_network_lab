@@ -127,6 +127,7 @@ if __name__ == '__main__':
     plt.plot(sampling_points, last_training_run, 'r', label='last training run')
     plt.plot(sampling_points, last_training_errors, '0.5', label='errors')
 
+    plt.axis([0, 2*math.pi, -1.1, 1.1])
     plt.axhline(color='k')
     plt.legend()
     plt.show()
