@@ -123,15 +123,9 @@ if __name__ == '__main__':
             last_training_errors[current_index] = output.errors
 
     # plot results
-    input_line, last_training_line, last_errors_line = plt.plot(
-        sampling_points, input_data, 'b',
-        sampling_points, last_training_run, 'r',
-        sampling_points, last_training_errors, '0.5',
-    )
-
-    input_line.set_label('input')
-    last_training_line.set_label('last training run')
-    last_errors_line.set_label('errors')
+    plt.plot(sampling_points, input_data, 'b', label='input')
+    plt.plot(sampling_points, last_training_run, 'r', label='last training run')
+    plt.plot(sampling_points, last_training_errors, '0.5', label='errors')
 
     plt.legend()
     plt.show()
