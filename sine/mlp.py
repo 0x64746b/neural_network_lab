@@ -123,7 +123,7 @@ if __name__ == '__main__':
             last_training_errors[next_index] = output.errors
 
     # plot results
-    plt.plot(sampling_points, input_data, 'b', label='input')
+    plt.plot(sampling_points, input_data, 'b', marker='.', label='input')
     plt.plot(sampling_points, last_training_run, 'r', label='last training run')
     plt.plot(sampling_points, last_training_errors, '0.5', label='errors')
 
