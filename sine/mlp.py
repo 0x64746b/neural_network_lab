@@ -127,5 +127,6 @@ if __name__ == '__main__':
     plt.plot(sampling_points, last_training_run, 'r', label='last training run')
     plt.plot(sampling_points, last_training_errors, '0.5', label='errors')
 
+    plt.axhline(color='k')
     plt.legend()
     plt.show()
