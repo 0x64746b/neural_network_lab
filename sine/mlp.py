@@ -114,7 +114,7 @@ if __name__ == '__main__':
         output.update()
         hidden.update()
 
-        if epoch > (NUM_EPOCHS - NUM_SAMPLES):
+        if epoch >= (NUM_EPOCHS - NUM_SAMPLES):
             print('input:', input_data[current_index])
             print('expected output:', input_data[next_index])
             print('actual output:', outputs)
