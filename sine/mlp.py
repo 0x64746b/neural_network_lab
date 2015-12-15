@@ -10,7 +10,6 @@ from __future__ import (
 
 
 from collections import deque
-import math
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -92,8 +91,8 @@ class RecurrentLayer(Layer):
 
 if __name__ == '__main__':
     # setup data
-    sampling_points = np.linspace(0, 2*math.pi, num=NUM_SAMPLES, endpoint=False)
-    input_data = np.array([math.sin(x) for x in sampling_points]).reshape((NUM_SAMPLES, 1))
+    sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
+    input_data = np.sin(sampling_points).reshape((NUM_SAMPLES, 1))
 
     # construct net
     hidden = RecurrentLayer(NUM_HIDDEN_NODES, input_data.shape[1], expit, HISTORY_LENGTH)
@@ -156,7 +155,7 @@ if __name__ == '__main__':
     plt.plot(
         np.linspace(
             0,
-            GENERATING_FACTOR*2*math.pi,
+            GENERATING_FACTOR*2*np.pi,
             num=NUM_GENERATED_SAMPLES,
             endpoint=False
         ),
@@ -164,7 +163,7 @@ if __name__ == '__main__':
         label='generated'
     )
 
-    plt.axis([0, GENERATING_FACTOR*2*math.pi, -1.1, 1.1])
+    plt.axis([0, GENERATING_FACTOR*2*np.pi, -1.1, 1.1])
     plt.axhline(color='k')
     plt.legend()
     plt.show()
