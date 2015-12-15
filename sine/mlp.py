@@ -88,14 +88,19 @@ class RecurrentLayer(Layer):
 
 
 if __name__ == '__main__':
+    # setup data
     sampling_points = np.linspace(0, 2*math.pi, num=NUM_SAMPLES, endpoint=False)
     input_data = np.array([math.sin(x) for x in sampling_points]).reshape((NUM_SAMPLES, 1))
     last_training_run = np.zeros(NUM_SAMPLES)
     last_training_errors = np.zeros(NUM_SAMPLES)
+    generating_run = np.zeros(NUM_SAMPLES)
 
+    # construct net
     hidden = RecurrentLayer(NUM_HIDDEN_NODES, input_data.shape[1], expit, HISTORY_LENGTH)
     output = Layer(input_data.shape[1], NUM_HIDDEN_NODES, lambda x: x)
 
+    # train
+    print('Training...')
     for epoch in range(NUM_EPOCHS):
         current_index = epoch % NUM_SAMPLES
         next_index = (current_index + 1) % NUM_SAMPLES
@@ -123,10 +128,18 @@ if __name__ == '__main__':
             last_training_run[next_index] = outputs
             last_training_errors[next_index] = output.errors
 
+    # generate
+    print('Generating...')
+    predecessor = np.array([0.0])
+    for index in range(NUM_SAMPLES):
+        predecessor = output.process(hidden.process(predecessor))
+        generating_run[(index+1) % NUM_SAMPLES] = predecessor
+
     # plot results
     plt.plot(sampling_points, input_data, 'b', marker='.', label='input')
-    plt.plot(sampling_points, last_training_run, 'r', label='last training run')
-    plt.plot(sampling_points, last_training_errors, '0.5', label='errors')
+    plt.plot(sampling_points, last_training_run, 'r', label='learnt')
+    plt.plot(sampling_points, last_training_errors, '0.5', label='error')
+    plt.plot(sampling_points, generating_run, 'g', label='generated')
 
     plt.axis([0, 2*math.pi, -1.1, 1.1])
     plt.axhline(color='k')
