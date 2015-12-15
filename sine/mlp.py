@@ -114,11 +114,12 @@ if __name__ == '__main__':
         output.update()
         hidden.update()
 
+        # log last run
         if epoch >= (NUM_EPOCHS - NUM_SAMPLES):
-            print('input:', input_data[current_index])
-            print('expected output:', input_data[next_index])
-            print('actual output:', outputs)
-            print('output error:', output.errors)
+            if epoch == (NUM_EPOCHS - NUM_SAMPLES):
+                print('{:^18} | {:^18} | {:^13} | {:^18}'.format('input', 'expected', 'actual', 'error'))
+                print('{:-^18} | {:-^18} | {:-^13} | {:-^18}'.format('', '', '', ''))
+            print('{:18} | {:18} | {:13} | {:18}'.format(input_data[current_index], input_data[next_index], outputs, output.errors))
             last_training_run[next_index] = outputs
             last_training_errors[next_index] = output.errors
 
