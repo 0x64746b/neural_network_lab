@@ -22,6 +22,9 @@ NUM_EPOCHS = 50000 * NUM_SAMPLES
 HISTORY_LENGTH = 3
 
 NUM_HIDDEN_NODES = 30
+GENERATING_FACTOR = 4
+NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
+
 ACCEPTED_ERROR = 1e-3
 ERROR_RATE = 0.05
 LEARNING_RATE = 0.1
@@ -126,12 +129,12 @@ if __name__ == '__main__':
 
     # generate
     print('Generating...')
-    generating_run = np.zeros(2 * NUM_SAMPLES)
+    generating_run = np.zeros(NUM_GENERATED_SAMPLES)
     predecessor = np.array([0.0])
 
-    for index in range(2 * NUM_SAMPLES):
+    for index in range(NUM_GENERATED_SAMPLES):
         predecessor = output.process(hidden.process(predecessor))
-        generating_run[(index+1) % (2 * NUM_SAMPLES)] = predecessor
+        generating_run[(index + 1) % NUM_GENERATED_SAMPLES] = predecessor
 
     # plot results
     print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
@@ -151,12 +154,17 @@ if __name__ == '__main__':
     plt.plot(sampling_points, last_training_run, 'r', label='learnt')
     plt.plot(sampling_points, last_training_errors, '0.5', label='error')
     plt.plot(
-        np.linspace(0, 4*math.pi, num=2*NUM_SAMPLES, endpoint=False),
+        np.linspace(
+            0,
+            GENERATING_FACTOR*2*math.pi,
+            num=NUM_GENERATED_SAMPLES,
+            endpoint=False
+        ),
         generating_run, 'g',
         label='generated'
     )
 
-    plt.axis([0, 4*math.pi, -1.1, 1.1])
+    plt.axis([0, GENERATING_FACTOR*2*math.pi, -1.1, 1.1])
     plt.axhline(color='k')
     plt.legend()
     plt.show()
