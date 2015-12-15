@@ -91,6 +91,7 @@ if __name__ == '__main__':
     # setup data
     sampling_points = np.linspace(0, 2*math.pi, num=NUM_SAMPLES, endpoint=False)
     input_data = np.array([math.sin(x) for x in sampling_points]).reshape((NUM_SAMPLES, 1))
+
     last_training_run = np.zeros(NUM_SAMPLES)
     last_training_errors = np.zeros(NUM_SAMPLES)
     generating_run = np.zeros(NUM_SAMPLES)
@@ -121,10 +122,6 @@ if __name__ == '__main__':
 
         # log last run
         if epoch >= (NUM_EPOCHS - NUM_SAMPLES):
-            if epoch == (NUM_EPOCHS - NUM_SAMPLES):
-                print('{:^18} | {:^18} | {:^13} | {:^18}'.format('input', 'expected', 'actual', 'error'))
-                print('{:-^18} | {:-^18} | {:-^13} | {:-^18}'.format('', '', '', ''))
-            print('{:18} | {:18} | {:13} | {:18}'.format(input_data[current_index], input_data[next_index], outputs, output.errors))
             last_training_run[next_index] = outputs
             last_training_errors[next_index] = output.errors
 
@@ -136,6 +133,19 @@ if __name__ == '__main__':
         generating_run[(index+1) % NUM_SAMPLES] = predecessor
 
     # plot results
+    print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
+    print('{:-^18} | {:-^18} | {:-^18} | {:-^18}'.format('', '', '', ''))
+    for index in range(NUM_SAMPLES):
+        next_index = (index + 1) % NUM_SAMPLES
+        print(
+            '{:18} | {:18} | {:< 18} | {:< 18}'.format(
+                input_data[index],
+                input_data[next_index],
+                last_training_run[next_index],
+                last_training_errors[next_index]
+            )
+        )
+
     plt.plot(sampling_points, input_data, 'b', marker='.', label='input')
     plt.plot(sampling_points, last_training_run, 'r', label='learnt')
     plt.plot(sampling_points, last_training_errors, '0.5', label='error')
