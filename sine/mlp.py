@@ -22,6 +22,7 @@ HISTORY_LENGTH = 3
 
 NUM_HIDDEN_NODES = 30
 GENERATING_FACTOR = 4
+FREQUENCY_FACTOR = 1.0
 NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
 
 ACCEPTED_ERROR = 1e-3
@@ -92,11 +93,19 @@ class RecurrentLayer(Layer):
 if __name__ == '__main__':
     # setup data
     sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
-    input_data = np.sin(sampling_points).reshape((NUM_SAMPLES, 1))
+
+    sine_input = np.sin(FREQUENCY_FACTOR * sampling_points)
+    frequency_input = [FREQUENCY_FACTOR] * NUM_SAMPLES
+
+    input_data = np.insert(
+        frequency_input,
+        range(NUM_SAMPLES),
+        sine_input
+    ).reshape(NUM_SAMPLES, 2)
 
     # construct net
     hidden = RecurrentLayer(NUM_HIDDEN_NODES, input_data.shape[1], expit, HISTORY_LENGTH)
-    output = Layer(input_data.shape[1], NUM_HIDDEN_NODES, lambda x: x)
+    output = Layer(1, NUM_HIDDEN_NODES, lambda x: x)
 
     # train
     print('Training...')
@@ -111,7 +120,7 @@ if __name__ == '__main__':
         outputs = output.process(hidden.process(input_data[current_index]))
 
         # backpropagate errors
-        output.errors = input_data[next_index] - outputs
+        output.errors = sine_input[next_index] - outputs
 
         hidden.errors.appendleft(expit_prime(hidden.h[0]) * np.dot(output.errors, output.weights))
         for index in range(1, len(hidden.errors)):
@@ -129,11 +138,12 @@ if __name__ == '__main__':
     # generate
     print('Generating...')
     generating_run = np.zeros(NUM_GENERATED_SAMPLES)
-    predecessor = np.array([0.0])
+    current_value = np.array([0.0, FREQUENCY_FACTOR])
 
     for index in range(NUM_GENERATED_SAMPLES):
-        predecessor = output.process(hidden.process(predecessor))
-        generating_run[(index + 1) % NUM_GENERATED_SAMPLES] = predecessor
+        next_value = output.process(hidden.process(current_value))
+        current_value = np.insert(next_value, 1, FREQUENCY_FACTOR)
+        generating_run[(index + 1) % NUM_GENERATED_SAMPLES] = next_value
 
     # plot results
     print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
@@ -142,14 +152,14 @@ if __name__ == '__main__':
         next_index = (index + 1) % NUM_SAMPLES
         print(
             '{:18} | {:18} | {:< 18} | {:< 18}'.format(
-                input_data[index],
-                input_data[next_index],
+                sine_input[index],
+                sine_input[next_index],
                 last_training_run[next_index],
                 last_training_errors[next_index]
             )
         )
 
-    plt.plot(sampling_points, input_data, 'b', marker='.', label='input')
+    plt.plot(sampling_points, sine_input, 'b', marker='.', label='input')
     plt.plot(sampling_points, last_training_run, 'r', label='learnt')
     plt.plot(sampling_points, last_training_errors, '0.5', label='error')
     plt.plot(
