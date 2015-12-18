@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
         hidden.errors.appendleft(expit_prime(hidden.h[0]) * np.dot(output.errors, output.weights))
         for index in range(1, len(hidden.errors)):
-            hidden.errors[index] = expit_prime(hidden.h[index]) * np.dot(hidden.errors[index-1], hidden.weights)
+            hidden.errors[index] = expit_prime(hidden.h[index]) * np.dot(hidden.errors[index-1], hidden.recurrent_weights)
 
         # learn
         output.update()
