@@ -108,7 +108,8 @@ if __name__ == '__main__':
         current_index = epoch % NUM_SAMPLES
         next_index = (current_index + 1) % NUM_SAMPLES
 
-        if current_index == 0:
+        if epoch % (5 * NUM_SAMPLES) == 0:
+            # change training frequency
             frequency_factor = float(np.random.random_integers(4))
 
             sine_input = np.sin(frequency_factor * sampling_points)
