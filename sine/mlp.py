@@ -21,6 +21,7 @@ NUM_EPOCHS = 50000 * NUM_SAMPLES
 
 GENERATING_FACTOR = 4
 NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
+GENERATING_FREQUENCIES = [1.0, 2.0]
 
 NUM_HIDDEN_NODES = 30
 HISTORY_LENGTH = 3
@@ -139,14 +140,28 @@ if __name__ == '__main__':
             last_training_errors[next_index] = output.errors
 
     # generate
-    print('Generating...')
-    generating_run = np.zeros(NUM_GENERATED_SAMPLES)
-    current_value = np.array([0.0, FREQUENCY_FACTOR])
+    color = 0.2
+    for frequency in GENERATING_FREQUENCIES:
+        print('Generating...')
+        generating_run = np.zeros(NUM_GENERATED_SAMPLES)
+        current_value = np.array([0.0, frequency])
 
-    for index in range(NUM_GENERATED_SAMPLES):
-        next_value = output.process(hidden.process(current_value))
-        current_value = np.insert(next_value, 1, FREQUENCY_FACTOR)
-        generating_run[(index + 1) % NUM_GENERATED_SAMPLES] = next_value
+        for index in range(NUM_GENERATED_SAMPLES):
+            next_value = output.process(hidden.process(current_value))
+            current_value = np.insert(next_value, 1, frequency)
+            generating_run[(index + 1) % NUM_GENERATED_SAMPLES] = next_value
+
+        plt.plot(
+            np.linspace(
+                0,
+                GENERATING_FACTOR*2*np.pi,
+                num=NUM_GENERATED_SAMPLES,
+                endpoint=False
+            ),
+            generating_run, str(color),
+            label='generated'
+        )
+        color += 0.4
 
     # plot results
     print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
@@ -165,16 +180,6 @@ if __name__ == '__main__':
     plt.plot(sampling_points, sine_input, 'b', marker='.', label='input')
     plt.plot(sampling_points, last_training_run, 'r', label='learnt')
     plt.plot(sampling_points, last_training_errors, '0.5', label='error')
-    plt.plot(
-        np.linspace(
-            0,
-            GENERATING_FACTOR*2*np.pi,
-            num=NUM_GENERATED_SAMPLES,
-            endpoint=False
-        ),
-        generating_run, 'g',
-        label='generated'
-    )
 
     plt.axis([0, GENERATING_FACTOR*2*np.pi, -1.1, 1.1])
     plt.axhline(color='k')
