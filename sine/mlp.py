@@ -16,8 +16,9 @@ import numpy as np
 from scipy.special import expit
 
 # [0, max, pi, min] + 3 recursive bisections for each resulting quarter
-NUM_SAMPLES = 4 + 4 * 7
-NUM_EPOCHS = 50000 * NUM_SAMPLES
+NUM_SAMPLES = 128
+NUM_TRAINING_CYCLES = 5000
+NUM_EPOCHS = NUM_TRAINING_CYCLES * NUM_SAMPLES
 
 GENERATING_FACTOR = 4
 NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
