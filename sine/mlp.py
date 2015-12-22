@@ -18,7 +18,6 @@ from scipy.special import expit
 # [0, max, pi, min] + 3 recursive bisections for each resulting quarter
 NUM_SAMPLES = 4 + 4 * 7
 NUM_EPOCHS = 50000 * NUM_SAMPLES
-FREQUENCY_FACTOR = 1.0
 
 GENERATING_FACTOR = 4
 NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
@@ -95,17 +94,8 @@ if __name__ == '__main__':
     # setup data
     sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
 
-    sine_input = np.sin(FREQUENCY_FACTOR * sampling_points)
-    frequency_input = [FREQUENCY_FACTOR] * NUM_SAMPLES
-
-    input_data = np.insert(
-        frequency_input,
-        range(NUM_SAMPLES),
-        sine_input
-    ).reshape(NUM_SAMPLES, 2)
-
     # construct net
-    hidden = RecurrentLayer(NUM_HIDDEN_NODES, input_data.shape[1], expit, HISTORY_LENGTH)
+    hidden = RecurrentLayer(NUM_HIDDEN_NODES, 2, expit, HISTORY_LENGTH)
     output = Layer(1, NUM_HIDDEN_NODES, lambda x: x)
 
     # train
@@ -116,6 +106,18 @@ if __name__ == '__main__':
     for epoch in range(NUM_EPOCHS):
         current_index = epoch % NUM_SAMPLES
         next_index = (current_index + 1) % NUM_SAMPLES
+
+        if current_index == 0:
+            frequency_factor = float(np.random.random_integers(4))
+
+            sine_input = np.sin(frequency_factor * sampling_points)
+            frequency_input = [frequency_factor] * NUM_SAMPLES
+
+            input_data = np.insert(
+                frequency_input,
+                range(NUM_SAMPLES),
+                sine_input
+            ).reshape(NUM_SAMPLES, 2)
 
         # process inputs
         outputs = output.process(hidden.process(input_data[current_index]))
