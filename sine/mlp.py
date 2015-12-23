@@ -68,8 +68,10 @@ class RecurrentLayer(Layer):
         self.recurrent_weights = np.random.uniform(-1.0, 1.0, (dimension, dimension))
         self.input_vectors = deque(maxlen=history_length)
         self.h = deque(maxlen=history_length)
-        self.outputs = deque(np.zeros(dimension * dimension).reshape(dimension, dimension), maxlen=history_length)
+        self.outputs = deque(np.zeros(dimension), maxlen=history_length)
         self.errors = deque(maxlen=history_length)
+
+        self._dimension = dimension
 
     def process(self, input_vector):
         weighted_sum = np.dot(self.weights, input_vector) + np.dot(self.recurrent_weights, self.outputs[0]) + self.biases
@@ -90,6 +92,14 @@ class RecurrentLayer(Layer):
             except IndexError:
                 pass
             self.biases += LEARNING_RATE * self.errors[index]
+
+    def clear(self):
+        self.input_vectors.clear()
+        self.h.clear()
+        self.outputs.clear()
+        self.errors.clear()
+
+        self.outputs.append(np.zeros(self._dimension))
 
 
 if __name__ == '__main__':
@@ -122,6 +132,8 @@ if __name__ == '__main__':
                 sine_input
             ).reshape(NUM_SAMPLES, 2)
 
+            hidden.clear()
+
         # process inputs
         outputs = output.process(hidden.process(input_data[current_index]))
 
@@ -147,6 +159,8 @@ if __name__ == '__main__':
         print('Generating...')
         generating_run = np.zeros(NUM_GENERATED_SAMPLES)
         current_value = np.array([0.0, frequency])
+
+        hidden.clear()
 
         for index in range(NUM_GENERATED_SAMPLES):
             next_value = output.process(hidden.process(current_value))
