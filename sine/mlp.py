@@ -68,7 +68,8 @@ class RecurrentLayer(Layer):
         self.recurrent_weights = np.random.uniform(-1.0, 1.0, (dimension, dimension))
         self.input_vectors = deque(maxlen=history_length)
         self.h = deque(maxlen=history_length)
-        self.outputs = deque(np.zeros(dimension), maxlen=history_length)
+        self.outputs = deque(maxlen=history_length)
+        self.outputs.append(np.zeros(dimension)) 
         self.errors = deque(maxlen=history_length)
 
         self._dimension = dimension
