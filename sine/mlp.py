@@ -16,8 +16,8 @@ import numpy as np
 from scipy.special import expit
 
 # [0, max, pi, min] + 3 recursive bisections for each resulting quarter
-NUM_SAMPLES = 128
-NUM_TRAINING_CYCLES = 5000
+NUM_SAMPLES = 32
+NUM_TRAINING_CYCLES = 10000
 NUM_EPOCHS = NUM_TRAINING_CYCLES * NUM_SAMPLES
 
 GENERATING_FACTOR = 4
@@ -29,7 +29,7 @@ HISTORY_LENGTH = 3
 
 ACCEPTED_ERROR = 1e-3
 ERROR_RATE = 0.05
-LEARNING_RATE = 0.1
+LEARNING_RATE = 0.01
 
 
 def expit_prime(h):
@@ -119,7 +119,7 @@ if __name__ == '__main__':
         current_index = epoch % NUM_SAMPLES
         next_index = (current_index + 1) % NUM_SAMPLES
 
-        if epoch % (5 * NUM_SAMPLES) == 0:
+        if epoch % (20 * NUM_SAMPLES) == 0:
             # change training frequency
             frequency_factor = float(np.random.random_integers(4))
 
@@ -196,8 +196,9 @@ if __name__ == '__main__':
     plt.plot(sampling_points, sine_input, 'b', marker='.', label='input')
     plt.plot(sampling_points, last_training_run, 'r', label='learnt')
     plt.plot(sampling_points, last_training_errors, '0.5', label='error')
+    plt.plot([2*np.pi, 4*np.pi, 6*np.pi], [0, 0, 0], 'ok')
 
-    plt.axis([0, GENERATING_FACTOR*2*np.pi, -1.1, 1.1])
+    plt.axis([0, GENERATING_FACTOR*2*np.pi, -1.5, 1.5])
     plt.axhline(color='k')
     plt.legend()
     plt.show()
