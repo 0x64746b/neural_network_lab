@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import expit
 
-from mlp import Layer, RecurrentLayer
+from mlp import expit_prime, Layer, RecurrentLayer
 
 
 # [0, max, pi, min] + 3 recursive bisections for each resulting quarter
@@ -30,10 +30,6 @@ GENERATING_FREQUENCIES = [1.0, 2.0]
 NUM_HIDDEN_NODES = 30
 HISTORY_LENGTH = 3
 LEARNING_RATE = 0.01
-
-
-def expit_prime(h):
-    return expit(h) * (1 - expit(h))
 
 
 if __name__ == '__main__':

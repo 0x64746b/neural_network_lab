@@ -11,6 +11,11 @@ from __future__ import (
 from collections import deque
 
 import numpy as np
+from scipy.special import expit
+
+
+def expit_prime(h):
+    return expit(h) * (1 - expit(h))
 
 
 class Layer(object):
@@ -79,5 +84,3 @@ class RecurrentLayer(Layer):
         self.errors.clear()
 
         self.outputs.append(np.zeros(self._dimension))
-
-
