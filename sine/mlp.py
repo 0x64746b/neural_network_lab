@@ -22,6 +22,8 @@ NUM_EPOCHS = NUM_TRAINING_CYCLES * NUM_SAMPLES
 
 GENERATING_FACTOR = 4
 NUM_GENERATED_SAMPLES = GENERATING_FACTOR * NUM_SAMPLES
+
+NUM_TRAINING_FREQUENCIES = 3
 GENERATING_FREQUENCIES = [1.0, 2.0]
 
 NUM_HIDDEN_NODES = 30
@@ -122,7 +124,7 @@ if __name__ == '__main__':
 
         if epoch % (20 * NUM_SAMPLES) == 0:
             # change training frequency
-            frequency_factor = float(np.random.random_integers(4))
+            frequency_factor = float(np.random.random_integers(NUM_TRAINING_FREQUENCIES))
 
             sine_input = np.sin(frequency_factor * sampling_points)
             frequency_input = [frequency_factor] * NUM_SAMPLES
