@@ -32,15 +32,8 @@ HISTORY_LENGTH = 3
 LEARNING_RATE = 0.01
 
 
-if __name__ == '__main__':
-    # setup data
-    sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
-
-    # construct net
-    hidden = RecurrentLayer(NUM_HIDDEN_NODES, 2, expit, HISTORY_LENGTH, LEARNING_RATE)
-    output = Layer(1, NUM_HIDDEN_NODES, lambda x: x, LEARNING_RATE)
-
-    # train
+def train(hidden, output, sampling_points):
+    """Train the given layers."""
     print('Training...')
     last_training_run = np.zeros(NUM_SAMPLES)
     last_training_errors = np.zeros(NUM_SAMPLES)
@@ -83,7 +76,11 @@ if __name__ == '__main__':
             last_training_run[next_index] = outputs
             last_training_errors[next_index] = output.errors
 
-    # generate
+    return sine_input, last_training_run, last_training_errors
+
+
+def generate(hidden, output):
+    """Generate sine curves with the configured frequencies."""
     color = 0.2
     for frequency in GENERATING_FREQUENCIES:
         print('Generating...')
@@ -109,6 +106,9 @@ if __name__ == '__main__':
         )
         color += 0.4
 
+
+def plot(sampling_points, sine_input, last_training_run, last_training_errors):
+    """Plot the results."""
     # plot results
     print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
     print('{:-^18} | {:-^18} | {:-^18} | {:-^18}'.format('', '', '', ''))
@@ -132,3 +132,21 @@ if __name__ == '__main__':
     plt.axhline(color='k')
     plt.legend()
     plt.show()
+
+
+if __name__ == '__main__':
+    # setup data
+    sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
+
+    # construct net
+    hidden = RecurrentLayer(NUM_HIDDEN_NODES, 2, expit, HISTORY_LENGTH, LEARNING_RATE)
+    output = Layer(1, NUM_HIDDEN_NODES, lambda x: x, LEARNING_RATE)
+
+    # train the network
+    last_run = train(hidden, output, sampling_points)
+
+    # generate some curves
+    generate(hidden, output)
+
+    # plot the results
+    plot(sampling_points, *last_run)
