@@ -15,7 +15,7 @@ from KTimage import importimage as import_image
 import numpy as np
 from scipy.special import expit
 
-from mlp import expit_prime
+from mlp import expit_prime, softmax
 
 
 NUM_HIDDEN_NODES = 100
@@ -27,13 +27,6 @@ LEARNING_RATE = 0.1
 # TODO: Check results for [MNIST data](http://yann.lecun.com/exdb/mnist/)
 # TODO: Parse commandline
 INPUT_DIR = 'data/digits_alph'
-
-
-def softmax(h):
-    # TODO: Worth using [Theano's implementation](http://deeplearning.net/software/theano/library/tensor/nnet/nnet.html#tensor.nnet.softmax)?
-    #       Does the returned `Softmax.0` instance need to be explicitly
-    #       `eval()`ed or can it just be passed around?
-    return np.exp(h) / np.exp(h).sum()
 
 
 def get_input_data(files):

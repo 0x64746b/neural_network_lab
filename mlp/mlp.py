@@ -19,6 +19,13 @@ def expit_prime(h):
     return expit(h) * (1 - expit(h))
 
 
+def softmax(h):
+    # TODO: Worth using [Theano's implementation](http://deeplearning.net/software/theano/library/tensor/nnet/nnet.html#tensor.nnet.softmax)?
+    #       Does the returned `Softmax.0` instance need to be explicitly
+    #       `eval()`ed or can it just be passed around?
+    return np.exp(h) / np.exp(h).sum()
+
+
 class Layer(object):
     """Encapsulate the state of a layer."""
 
