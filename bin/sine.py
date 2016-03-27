@@ -9,11 +9,12 @@ from __future__ import (
 )
 
 
-from collections import deque
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import expit
+
+from mlp import expit_prime, Layer, RecurrentLayer
+
 
 # [0, max, pi, min] + 3 recursive bisections for each resulting quarter
 NUM_SAMPLES = 32
@@ -28,92 +29,11 @@ GENERATING_FREQUENCIES = [1.0, 2.0]
 
 NUM_HIDDEN_NODES = 30
 HISTORY_LENGTH = 3
-
-ACCEPTED_ERROR = 1e-3
-ERROR_RATE = 0.05
 LEARNING_RATE = 0.01
 
 
-def expit_prime(h):
-    return expit(h) * (1 - expit(h))
-
-
-class Layer(object):
-    """Encapsulate the state of a layer."""
-
-    def __init__(self, dimension, input_dimension, transfer_func):
-        self.weights = np.random.uniform(-1.0, 1.0, (dimension, input_dimension))
-        self.biases = np.ones(dimension)
-        self.errors = np.ones(dimension)
-
-        self._input_vector = np.zeros(input_dimension)
-        self._transfer_func = transfer_func
-
-    def process(self, input_vector):
-        self._input_vector = input_vector
-        # FIXME: Limited to transfer functions that work on the weighted sum of
-        #        the inputs
-        self.h = np.dot(self.weights, input_vector) + self.biases
-        return self._transfer_func(self.h)
-
-    def update(self):
-        self.weights += LEARNING_RATE * np.outer(self.errors, self._input_vector)
-        self.biases += LEARNING_RATE * self.errors
-
-
-class RecurrentLayer(Layer):
-    """Encapsulate the state of a recurrent layer."""
-
-    def __init__(self, dimension, input_dimension, transfer_func, history_length=None):
-        super(RecurrentLayer, self).__init__(dimension, input_dimension, transfer_func)
-
-        self.recurrent_weights = np.random.uniform(-1.0, 1.0, (dimension, dimension))
-        self.input_vectors = deque(maxlen=history_length)
-        self.h = deque(maxlen=history_length)
-        self.outputs = deque(maxlen=history_length)
-        self.outputs.append(np.zeros(dimension)) 
-        self.errors = deque(maxlen=history_length)
-
-        self._dimension = dimension
-
-    def process(self, input_vector):
-        weighted_sum = np.dot(self.weights, input_vector) + np.dot(self.recurrent_weights, self.outputs[0]) + self.biases
-        activation = self._transfer_func(weighted_sum)
-
-        # update history
-        self.input_vectors.appendleft(input_vector)
-        self.h.appendleft(weighted_sum)
-        self.outputs.appendleft(activation)
-
-        return activation
-
-    def update(self):
-        for index in range(len(self.errors)):
-            self.weights += LEARNING_RATE * np.outer(self.errors[index], self.input_vectors[index])
-            try:
-                self.recurrent_weights += LEARNING_RATE * np.outer(self.errors[index], self.outputs[index+1])
-            except IndexError:
-                pass
-            self.biases += LEARNING_RATE * self.errors[index]
-
-    def clear(self):
-        self.input_vectors.clear()
-        self.h.clear()
-        self.outputs.clear()
-        self.errors.clear()
-
-        self.outputs.append(np.zeros(self._dimension))
-
-
-if __name__ == '__main__':
-    # setup data
-    sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
-
-    # construct net
-    hidden = RecurrentLayer(NUM_HIDDEN_NODES, 2, expit, HISTORY_LENGTH)
-    output = Layer(1, NUM_HIDDEN_NODES, lambda x: x)
-
-    # train
+def train(hidden, output, sampling_points):
+    """Train the given layers."""
     print('Training...')
     last_training_run = np.zeros(NUM_SAMPLES)
     last_training_errors = np.zeros(NUM_SAMPLES)
@@ -156,7 +76,11 @@ if __name__ == '__main__':
             last_training_run[next_index] = outputs
             last_training_errors[next_index] = output.errors
 
-    # generate
+    return sine_input, last_training_run, last_training_errors
+
+
+def generate(hidden, output):
+    """Generate sine curves with the configured frequencies."""
     color = 0.2
     for frequency in GENERATING_FREQUENCIES:
         print('Generating...')
@@ -182,6 +106,9 @@ if __name__ == '__main__':
         )
         color += 0.4
 
+
+def plot(sampling_points, sine_input, last_training_run, last_training_errors):
+    """Plot the results."""
     # plot results
     print('{:^18} | {:^18} | {:^18} | {:^18}'.format('input', 'expected', 'actual', 'error'))
     print('{:-^18} | {:-^18} | {:-^18} | {:-^18}'.format('', '', '', ''))
@@ -205,3 +132,21 @@ if __name__ == '__main__':
     plt.axhline(color='k')
     plt.legend()
     plt.show()
+
+
+if __name__ == '__main__':
+    # setup data
+    sampling_points = np.linspace(0, 2*np.pi, num=NUM_SAMPLES, endpoint=False)
+
+    # construct net
+    hidden = RecurrentLayer(NUM_HIDDEN_NODES, 2, expit, HISTORY_LENGTH, LEARNING_RATE)
+    output = Layer(1, NUM_HIDDEN_NODES, lambda x: x, LEARNING_RATE)
+
+    # train the network
+    last_run = train(hidden, output, sampling_points)
+
+    # generate some curves
+    generate(hidden, output)
+
+    # plot the results
+    plot(sampling_points, *last_run)
