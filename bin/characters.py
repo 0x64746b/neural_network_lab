@@ -9,13 +9,12 @@ from __future__ import (
 )
 
 import os
-import re
-
-import numpy as np
-from scipy.special import expit
 
 # external dependency [provided by organizer](https://www2.informatik.uni-hamburg.de/~weber/code/KTimage.py).
 from KTimage import importimage as import_image
+import numpy as np
+from scipy.special import expit
+
 
 
 NUM_HIDDEN_NODES = 100
