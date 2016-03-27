@@ -11,6 +11,7 @@ from __future__ import (
 from collections import deque
 
 import numpy as np
+from pandas import ewma
 from scipy.special import expit
 
 
@@ -84,3 +85,25 @@ class RecurrentLayer(Layer):
         self.errors.clear()
 
         self.outputs.append(np.zeros(self._dimension))
+
+
+class AverageError(object):
+
+    def __init__(self, target=1e-10, smoothing_factor=0.05):
+        self._target = target
+        self._center_of_mass = 1 / smoothing_factor - 1
+        self._value = 1.0
+
+    def update(self, error):
+        self._value = ewma(
+            np.array([self._value, abs(error)]),
+            com=self._center_of_mass,
+            adjust=False
+        )[-1]
+
+    @property
+    def too_large(self):
+        return bool(self._value > self._target)
+
+    def __str__(self):
+        return str(self._value)
