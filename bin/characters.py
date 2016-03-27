@@ -15,6 +15,7 @@ from KTimage import importimage as import_image
 import numpy as np
 from scipy.special import expit
 
+from mlp import expit_prime
 
 
 NUM_HIDDEN_NODES = 100
@@ -26,10 +27,6 @@ LEARNING_RATE = 0.1
 # TODO: Check results for [MNIST data](http://yann.lecun.com/exdb/mnist/)
 # TODO: Parse commandline
 INPUT_DIR = 'data/digits_alph'
-
-
-def expit_prime(h):
-    return expit(h) * (1 - expit(h))
 
 
 def softmax(h):
