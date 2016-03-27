@@ -11,12 +11,10 @@ from __future__ import (
 import numpy as np
 from scipy.special import expit
 
-from mlp import AverageError, Layer
+from mlp import AverageError, expit_prime, Layer
+
 
 NUM_HIDDEN_NODES = 3
-
-
-expit_prime = lambda h: expit(h) * (1 - expit(h))
 
 
 if __name__ == '__main__':
