@@ -26,7 +26,7 @@ LEARNING_RATE = 0.1
 # Input samples provided by organizer.
 # TODO: Check results for [MNIST data](http://yann.lecun.com/exdb/mnist/)
 # TODO: Parse commandline
-INPUT_DIR = 'digits_alph'
+INPUT_DIR = 'data/digits_alph'
 
 
 def expit_prime(h):
