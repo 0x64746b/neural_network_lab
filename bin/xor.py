@@ -12,6 +12,7 @@ import numpy as np
 from pandas import ewma
 from scipy.special import expit
 
+from mlp import Layer
 
 NUM_HIDDEN_NODES = 3
 ACCEPTED_ERROR = 1e-10
@@ -42,28 +43,6 @@ class AverageError(object):
 
     def __str__(self):
         return str(self._value)
-
-
-class Layer(object):
-
-    """Encapsulate the state of a layer."""
-
-    def __init__(self, dimension, input_dimension, transfer_func):
-        self.weights = np.random.uniform(-1.0, 1.0, (dimension, input_dimension))
-        self.biases = np.ones(dimension)
-        self.errors = np.ones(dimension)
-        self._transfer_func = transfer_func
-
-    def process(self, input_vector):
-        self.input_vector = input_vector
-        # FIXME: Limited to transfer functions that work on the weighted sum of
-        #        the inputs
-        self.h = np.dot(self.weights, input_vector) + self.biases
-        return self._transfer_func(self.h)
-
-    def update(self):
-        self.weights += LEARNING_RATE * np.outer(self.errors, self.input_vector)
-        self.biases += LEARNING_RATE * self.errors
 
 
 if __name__ == '__main__':
